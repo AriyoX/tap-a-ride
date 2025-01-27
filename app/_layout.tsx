@@ -1,59 +1,93 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
+import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
 import { useColorScheme } from '@/components/useColorScheme';
+import { Stack } from 'expo-router';
+import { Pressable, View, Image, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+const Drawer = createDrawerNavigator();
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
+function CustomDrawerContent(props: DrawerContentComponentProps) {
+  return (
+    <DrawerContentScrollView {...props}>
+      <View style={{
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#333',
+        marginBottom: 8,
+      }}>
+        <Image 
+          source={require('../assets/images/favicon.png')}
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            marginBottom: 12,
+          }}
+        />
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+          Hi, Roger
+        </Text>
+        <Text style={{ color: '#888', fontSize: 12 }}>
+          Welcome back!
+        </Text>
+      </View>
+      <DrawerItemList {...props} />
+    </DrawerContentScrollView>
+  );
 }
 
-function RootLayoutNav() {
+export default function Layout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          backgroundColor: '#1a1a1a',
+          width: 240,
+          paddingHorizontal: 10,
+          paddingTop: 20,
+          borderRadius: 0,
+        },
+        drawerLabelStyle: {
+          color: '#fff',
+          fontSize: 14,
+          marginLeft: -8,
+        },
+        drawerItemStyle: {
+          borderRadius: 6,
+          marginVertical: 2,
+          paddingVertical: 4,
+        },
+        drawerActiveTintColor: '#fff',
+        drawerInactiveTintColor: '#888',
+        drawerActiveBackgroundColor: '#333',
+      }}
+    >
+      <Drawer.Screen 
+        name="index" 
+        component={require('./index').default}
+        options={{
+          drawerLabel: 'Home',
+          drawerIcon: ({color, size}) => (
+            <Ionicons name="home" size={size} color={color} />
+          )
+        }}
+      />
+      {/* <Drawer.Screen 
+        name="profile" 
+        component={require('./profile').default}
+        options={{
+          drawerLabel: 'Profile',
+          drawerIcon: ({color, size}) => (
+            <Ionicons name="person" size={size} color={color} />
+          )
+        }}
+      /> */}
+      {/* Add more drawer screens as needed */}
+    </Drawer.Navigator>
   );
 }

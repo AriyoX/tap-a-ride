@@ -4,23 +4,34 @@ import { Text, View } from '@/components/Themed';
 import { TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 
-export default function TabOneScreen() {
-  const [userRole, setUserRole] = useState('rider'); // 'rider' or 'driver'
+export default function HomeScreen() {
+  const [userRole, setUserRole] = useState('pooler'); // 'pooler' or 'driver'
+  const navigation = useNavigation<DrawerNavigationProp<any>>();
 
   return (
     <View style={styles.container}>
       <MapView style={styles.map} />
       
+      {/* Menu Button */}
+      <TouchableOpacity 
+        style={styles.menuButton} 
+        onPress={() => navigation.openDrawer()}
+      >
+        <Ionicons name="menu" size={24} color="#fff" />
+      </TouchableOpacity>
+
       {/* Address Input Overlay */}
       <View style={styles.overlay}>
         {/* Role Switcher */}
         <View style={styles.roleSwitcher}>
           <TouchableOpacity 
-            style={[styles.roleTab, userRole === 'rider' && styles.activeTab]}
-            onPress={() => setUserRole('rider')}
+            style={[styles.roleTab, userRole === 'pooler' && styles.activeTab]}
+            onPress={() => setUserRole('pooler')}
           >
-            <Text style={[styles.roleText, userRole === 'rider' && styles.activeText]}>Rider</Text>
+            <Text style={[styles.roleText, userRole === 'pooler' && styles.activeText]}>Pooler</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.roleTab, userRole === 'driver' && styles.activeTab]}
@@ -32,7 +43,7 @@ export default function TabOneScreen() {
 
         <Text style={styles.greeting}>Hi Roger,</Text>
         <Text style={styles.question}>
-          {userRole === 'rider' ? 'Where are you going today?' : 'Where are you driving to?'}
+          {userRole === 'pooler' ? 'Where are you going today?' : 'Where are you driving to?'}
         </Text>
         
         <View style={styles.searchContainer}>
@@ -141,5 +152,21 @@ const styles = StyleSheet.create({
   },
   activeText: {
     color: '#fff',
+  },
+  menuButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: '#1a1a1a',
+    padding: 12,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
