@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import * as Location from 'expo-location';
+import { Animated } from 'react-native';
 
 const mapDarkStyle = [
   {
@@ -96,6 +97,9 @@ export default function HomeScreen() {
   const [location, setLocation] = useState<{latitude: number, longitude: number} | null>(null);
   const navigation = useNavigation<DrawerNavigationProp<any>>();
   const mapRef = useRef<MapView>(null);
+  const [inputText, setInputText] = useState('');
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const overlayHeight = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     (async () => {
@@ -121,6 +125,14 @@ export default function HomeScreen() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    Animated.timing(overlayHeight, {
+      toValue: isInputFocused || inputText.length > 0 ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isInputFocused, inputText]);
 
   const zoomToUserLocation = async () => {
     if (!location) {
@@ -196,9 +208,20 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Address Input Overlay */}
-      <View style={[styles.overlay, {
-        backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff'
-      }]}>
+      <Animated.View style={[
+        styles.overlay,
+        {
+          backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff',
+          height: overlayHeight.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['25%', '95%']
+          }),
+          bottom: overlayHeight.interpolate({
+            inputRange: [0, 1],
+            outputRange: [20, 20]
+          }),
+        }
+      ]}>
         {/* Role Switcher */}
         <View style={styles.roleSwitcher}>
           <TouchableOpacity 
@@ -233,13 +256,17 @@ export default function HomeScreen() {
             }]}
             placeholder="Type the address..."
             placeholderTextColor="#666"
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
+            onChangeText={setInputText}
+            value={inputText}
           />
           <TouchableOpacity style={styles.searchButton}>
             <Ionicons name="search" size={20} color="#666" />
           </TouchableOpacity>
         </View>
 
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -254,12 +281,11 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: 'absolute',
-    bottom: 20, // Move up from bottom
-    left: 20,   // Add space from left
-    right: 20,  // Add space from right
+    left: 20,
+    right: 20,
     backgroundColor: '#1a1a1a',
     padding: 20,
-    borderRadius: 20, // Round all corners
+    borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
