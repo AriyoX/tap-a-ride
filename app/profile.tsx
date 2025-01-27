@@ -1,13 +1,18 @@
-import { StyleSheet } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useColorScheme } from '@/components/useColorScheme';
 
 export default function ProfileScreen() {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ride History</Text>
-      <View style={styles.listContainer}>
-        <Text style={styles.emptyText}>No rides yet</Text>
-      </View>
+    <View style={[styles.container, {
+      backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff'
+    }]}>
+      <Text style={[styles.text, {
+        color: isDarkMode ? '#ffffff' : '#000000'
+      }]}>Profile Screen</Text>
     </View>
   );
 }
@@ -15,23 +20,9 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-    paddingTop: 60,
-    paddingHorizontal: 20,
+    padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
-  },
-  listContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    color: '#666',
+  text: {
     fontSize: 16,
   }
 });
